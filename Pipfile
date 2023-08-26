@@ -13,8 +13,10 @@ requests = "*"
 sh = "*"
 tqdm = "*"
 urllib3 = "*"
+cython = "*"
 
 [dev-packages]
+pyinstaller = "*"
 
 [requires]
 python_version = "3.11"
