@@ -14,6 +14,8 @@ sh = "*"
 tqdm = "*"
 urllib3 = "*"
 cython = "*"
+colorama = "*"
+wget = "*"
 
 [dev-packages]
 pyinstaller = "*"
