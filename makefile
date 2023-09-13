@@ -1,4 +1,4 @@
-.PHONY: help dev build
+.PHONY: help dev upgrade
 VENV_NAME?=venv
 VENV_ACTIVATE=$(shell pwd)/$(VENV_NAME)/bin/activate
 PYTHON=${VENV_NAME}/bin/python3
@@ -23,5 +23,5 @@ dev:
 	@python3 -m venv venv
 
 # 进入虚拟环境
-build: dev
+upgrade: dev
 	. $(VENV_ACTIVATE) && pip3 install -r requirements.txt && $(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress --show-memory --follow-imports  $(SRC)/main.py -o dpm && deactivate && mv build/dpm ../../ && rm -rf venv/ build/ && cd / && rm -rf /usr/local/DPM/TEMP/DPM_SRC /usr/local/bin/dpm && ln -s /usr/local/DPM/dpm /usr/local/bin && echo "請按下enter結束"

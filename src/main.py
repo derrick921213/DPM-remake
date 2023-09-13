@@ -146,7 +146,7 @@ class Action:
         # shutil.copytree(GIT_PATH, BACKUP_PATH)
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
             # # 重启程序
-        subprocess.Popen(["make build"], shell=True,cwd=GIT_PATH)
+        subprocess.Popen(["make upgrade"], shell=True,cwd=GIT_PATH)
         sys.exit(0)
 class Download:
     def read_package_list(self, *args,**kwargs):
