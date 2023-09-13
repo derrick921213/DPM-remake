@@ -148,52 +148,6 @@ class Action:
             # # 重启程序
         subprocess.Popen(["make build"], shell=True,cwd=GIT_PATH)
         sys.exit(0)
-        # if package is None or package == ' ':
-        #     if verbose:
-        #         test = os.system(
-        #             '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/derrick921213/Derrick_package_manager-DPM-/main/bin/update.sh?$(date +%s))"')
-        #         if test == 0:
-        #             print(f"[DPM] self update successfully!!")
-        #             sys.exit(0)
-        #     test2 = os.system(
-        #         '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/derrick921213/Derrick_package_manager-DPM-/main/bin/update.sh?$(date +%s))" >/dev/null 2>&1')
-        #     if test2 == 0:
-        #         print(f"[DPM] self update successfully!!")
-        #         sys.exit(0)
-        # else:
-        #     download = Download()
-        #     is_my = download.package_list()
-        #     if package in is_my:
-        #         if len(download.installed_package_list(verbose=False)) > 0:
-        #             if os.path.isdir(f"/usr/local/DPM/{package}"):
-        #                 if os.path.isfile(f"/usr/local/DPM/{package}/package.json"):
-        #                     with open(f"/usr/local/DPM/{package}/package.json", "r") as f:
-        #                         installed_info = json.loads(f.read())
-        #                         download = Download()
-        #                         download.download_file(
-        #                             download.read_package_list(package, verbose=True))
-        #                         info = download.read_package_info(package)
-        #                         if info["version"] > installed_info["version"]:
-        #                             self.install_update(package, verbose)
-        #                         else:
-        #                             print(f"[{package}] no update!!")
-        #                 else:
-        #                     print(f"[{package}] Update Error")
-        #             else:
-        #                 print(f"[{package}] not installed")
-        #         else:
-        #             print(f'[{package}] install first')
-        #     else:
-        #         shell = Shell()
-        #         system = shell.system_platform()
-        #         if system == 'linux':
-        #             if verbose:
-        #                 shell.linux_shell(package, update=True, verbose=True)
-        #             shell.linux_shell(package, update=True)
-        #         elif system == 'darwin':
-        #             if verbose:
-        #                 shell.mac_shell(package, update=True, verbose=True)
-        #             shell.mac_shell(package, update=True)
 class Download:
     def read_package_list(self, *args,**kwargs):
         data_json = self.package_list()

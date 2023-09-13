@@ -24,4 +24,4 @@ dev:
 
 # 进入虚拟环境
 build: dev
-	. $(VENV_ACTIVATE) && pip3 install -r requirements.txt && $(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress --show-memory --follow-imports  $(SRC)/main.py -o dpm && deactivate && mv build/dpm ../../ && rm -rf venv/ build/ && cd / && rm -rf /usr/local/DPM/TEMP/DPM_SRC && ln -s /usr/local/DPM/dpm /usr/local/bin && exit 0
+	. $(VENV_ACTIVATE) && pip3 install -r requirements.txt && $(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress --show-memory --follow-imports  $(SRC)/main.py -o dpm && deactivate && mv build/dpm ../../ && rm -rf venv/ build/ && cd / && rm -rf /usr/local/DPM/TEMP/DPM_SRC /usr/local/DPM/dpm && ln -s /usr/local/DPM/dpm /usr/local/bin && echo -e "\n"

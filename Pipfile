@@ -11,6 +11,7 @@ requests = "*"
 colorama = "*"
 gitpython = "*"
 tqdm = "*"
+cprofilev = "*"
 
 [dev-packages]
 nuitka = "*"
