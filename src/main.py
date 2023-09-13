@@ -135,24 +135,14 @@ class Action:
 
     def update(self, **kwargs):
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
-        try:
-            if os.path.exists(BACKUP_PATH):
-                shutil.rmtree(BACKUP_PATH)
-            if not os.path.exists(GIT_PATH):
-                os.mkdir(GIT_PATH)
-            shutil.copytree(GIT_PATH, BACKUP_PATH)
-            git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-            os.chdir(GIT_PATH)
+        # if os.path.exists(BACKUP_PATH):
+        #     shutil.rmtree(BACKUP_PATH)
+        os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
+        # shutil.copytree(GIT_PATH, BACKUP_PATH)
+        git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
             # # 重启程序
-            subprocess.Popen(["sudo make build"])
-            sys.exit(0)
-        except Exception as e:
-            print(f"更新失败: {str(e)}")
-            # 在更新失败时，你可以回滚到备份的旧版本
-            if os.path.exists(BACKUP_PATH):
-                shutil.rmtree(GIT_PATH)
-                shutil.copytree(BACKUP_PATH, GIT_PATH)
-            sys.exit(1)
+        subprocess.Popen(["make build"], shell=True,cwd=GIT_PATH)
+        sys.exit(0)
         # if package is None or package == ' ':
         #     if verbose:
         #         test = os.system(
