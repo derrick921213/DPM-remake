@@ -38,7 +38,12 @@ class Error(Exception):
         return self.message
 class Action:
     def installed_package_list(self, **kwargs) -> list[str]:
-        try: installed_package = [e for e in os.listdir('/usr/local/DPM') if e != 'TEMP' or e!='dpm']
+        installed_package = []
+        try:
+            for e in os.listdir('/usr/local/DPM'):
+                if e == 'TEMP' or e=='dpm' :
+                    continue
+                installed_package.append(e)
         except FileNotFoundError: raise Error(f'{Fore.RED}未安裝 DPM 無法顯示已安裝軟體!{Style.RESET_ALL}')
         if len(installed_package) > 0: [print(e) for e in installed_package if kwargs.get('verbose',False)];return installed_package 
         else: raise Error(f'{Fore.RED}嘗試安裝軟體後再試一次{Style.RESET_ALL}')
