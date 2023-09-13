@@ -140,12 +140,8 @@ class Action:
 
     def update(self, **kwargs):
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
-        # if os.path.exists(BACKUP_PATH):
-        #     shutil.rmtree(BACKUP_PATH)
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
-        # shutil.copytree(GIT_PATH, BACKUP_PATH)
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-            # # 重启程序
         subprocess.Popen(["make upgrade"], shell=True,cwd=GIT_PATH)
         sys.exit(0)
 class Download:
