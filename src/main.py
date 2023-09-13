@@ -144,7 +144,7 @@ class Action:
             git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
             os.chdir(GIT_PATH)
             # # 重启程序
-            subprocess.Popen(["make"])
+            subprocess.Popen(["sudo make build"])
             sys.exit(0)
         except Exception as e:
             print(f"更新失败: {str(e)}")
