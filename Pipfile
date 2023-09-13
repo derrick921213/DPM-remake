@@ -5,20 +5,16 @@ name = "pypi"
 
 [packages]
 argcomplete = "*"
-certifi = "*"
-charset-normalizer = "*"
-idna = "*"
 pyzshcomplete = "*"
-requests = "*"
-sh = "*"
-tqdm = "*"
-urllib3 = "*"
-cython = "*"
-colorama = "*"
 wget = "*"
+requests = "*"
+colorama = "*"
+gitpython = "*"
+tqdm = "*"
 
 [dev-packages]
-pyinstaller = "*"
+nuitka = "*"
 
 [requires]
 python_version = "3.11"
+python_full_version = "3.11.5"
