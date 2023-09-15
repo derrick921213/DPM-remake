@@ -155,6 +155,10 @@ class Download:
         if len(args)==0:
             verbose = kwargs.get('verbose')
             ret = {}
+            is_my:dict = Download().package_list()
+            kwargs["NotMy"]:list = []
+            kwargs["My"]:list = []
+            [kwargs['NotMy'].append(i) if i not in is_my else kwargs['My'].append(i) for i in kwargs.get('package')]
             for name in kwargs.get('My'):
                 if name in data_json:
                     if verbose:
@@ -354,7 +358,7 @@ class Shell:
             sys.exit(1)
 class Main:
     
-    def __init__(self,args:_arg.Namespace):
+    def __init__(self,args):
         action = Action()
         download = Download()
         self.FUNC = {
@@ -373,15 +377,18 @@ class Main:
             'verbose': args.verbose,
         }
         if args.commands == "search":
-            if 'list' in func_args['package'][0] or 'ls' in func_args['package'][0]:
-                del func_args['package'][0]
-                result = self.FUNC.get(args.commands)[0](**func_args)
-                print(f'{Fore.GREEN}---------------{Style.RESET_ALL}')
-                for keys in result.keys():
-                    print(f'{Fore.YELLOW}{keys}{Style.RESET_ALL}')
-                print(f"{Fore.GREEN}----{Style.RESET_ALL}{Fore.LIGHTBLUE_EX}These package can install from repository{Style.RESET_ALL}{Fore.GREEN}----{Style.RESET_ALL}")
-            else:
-                self.FUNC.get(args.commands)[1](**func_args)
+            try:
+                if 'list' in func_args['package'][0] or 'ls' in func_args['package'][0]:
+                    del func_args['package'][0]
+                    result = self.FUNC.get(args.commands)[0](**func_args)
+                    print(f'{Fore.GREEN}---------------{Style.RESET_ALL}')
+                    for keys in result.keys():
+                        print(f'{Fore.YELLOW}{keys}{Style.RESET_ALL}')
+                    print(f"{Fore.GREEN}----{Style.RESET_ALL}{Fore.LIGHTBLUE_EX}These package can install from repository{Style.RESET_ALL}{Fore.GREEN}----{Style.RESET_ALL}")
+                else:
+                    self.FUNC.get(args.commands)[1](**func_args)
+            except IndexError:
+                pass
         else:
             self.FUNC.get(args.commands)(**func_args)
 
