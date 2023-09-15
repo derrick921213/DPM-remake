@@ -19,7 +19,7 @@ activate_pyzshcomplete
 cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
 sed -i '8i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
-sed -i '9i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
+sed -i '9i\autoload -U +X bashcompinit;bashcompinit' ~/.zshrc
 sed -i '10i\eval "$(register-python-argcomplete3 dpm)"' ~/.zshrc
 echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
 echo 'eval "$(register-python-argcomplete dpm)"'>> ~/.bashrc
