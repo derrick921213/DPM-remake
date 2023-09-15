@@ -1,6 +1,7 @@
 #!/bin/bash
 #__author__:derrick921213
 cd /tmp
+sudo apt update -y && sudo apt install python3-venv
 sudo pip3 install argcomplete pyzshcomplete
 git clone https://github.com/derrick921213/DPM-remake.git DPM_SRC
 if [ "$?" != '0' ]; then
