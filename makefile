@@ -16,7 +16,7 @@ help:
 dev:
 	@python3 -m venv venv
 upgrade: dev
-	@. $(VENV_ACTIVATE) && \
+	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --follow-imports  $(SRC)/main.py -o dpm && \
 	deactivate && \
