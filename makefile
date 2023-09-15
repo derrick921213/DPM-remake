@@ -16,7 +16,7 @@ help:
 dev:
 	@python3 -m venv venv
 upgrade: dev
-	. $(VENV_ACTIVATE) && \
+	@. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --follow-imports  $(SRC)/main.py -o dpm && \
 	deactivate && \
@@ -27,12 +27,11 @@ upgrade: dev
 	ln -s /usr/local/DPM/dpm /usr/local/bin && \
 	echo "請按下enter結束"
 install: dev
-	. $(VENV_ACTIVATE) && \
+	@. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --follow-imports  $(SRC)/main.py -o dpm && \
 	deactivate && \
 	mv build/dpm ../../ && \
-	rm -rf venv/ build/ && \
 	cd / && \
-	rm -rf /usr/local/DPM/TEMP/DPM_SRC /usr/local/bin/dpm && \
+	rm -rf /usr/local/DPM/TEMP/DPM_SRC && \
 	ln -s /usr/local/DPM/dpm /usr/local/bin
