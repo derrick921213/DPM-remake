@@ -9,12 +9,11 @@ import sys,os,json,wget,subprocess,requests,tarfile,shutil,git
 from urllib.request import urlopen
 from io import BytesIO
 from colorama import Fore, Style
-from typing import Literal,LiteralString
 from git import RemoteProgress
 from tqdm import tqdm
 import time
-INSTALL_DIR:Literal = "/usr/local/DPM"
-DOWNLOAD_TEMP:LiteralString = os.path.join(INSTALL_DIR,'TEMP')
+INSTALL_DIR = "/usr/local/DPM"
+DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/local/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC' 
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
