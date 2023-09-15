@@ -1,8 +1,8 @@
 #!/bin/bash
 #__author__:derrick921213
 cd /tmp
-sudo apt update -y && sudo apt install python3-venv patchelf -y
-sudo pip3 install argcomplete pyzshcomplete
+sudo apt update -y && sudo apt install python3-venv patchelf python-argcomplete -y
+sudo pip3 install pyzshcomplete
 git clone https://github.com/derrick921213/DPM-remake.git DPM_SRC
 if [ "$?" != '0' ]; then
     echo "git Error"
