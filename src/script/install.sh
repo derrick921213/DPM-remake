@@ -18,9 +18,9 @@ activate-global-python-argcomplete --user
 activate_pyzshcomplete
 cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
-echo 'export PATH="~/.local/bin:$PATH"' >>~/.zshrc
-echo 'autoload -U bashcompinit;bashcompinit' >>~/.zshrc
-echo 'eval "$(register-python-argcomplete dpm)"' >>~/.zshrc
-echo 'export PATH="~/.local/bin:$PATH"' >>~/.bashrc
-echo 'eval "$(register-python-argcomplete dpm)"' >>~/.bashrc
+sed -i '1i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
+sed -i '1i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
+sed -i '1i\eval "$(register-python-argcomplete dpm)"' ~/.zshrc
+sed -i '1i\export PATH="~/.local/bin:$PATH"' ~/.bashrc
+sed -i '1i\eval "$(register-python-argcomplete dpm)"' ~/.bashrc
 echo [DPM] Install successful.
