@@ -31,7 +31,7 @@ install: dev
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --follow-imports  $(SRC)/main.py -o dpm && \
 	deactivate && \
-	mv build/dpm /usr/local/DPM && \
+	mv build/dpm /usr/local/DPM/ && \
 	cd / && \
 	rm -rf $(shell pwd) && \
 	ln -s /usr/local/DPM/dpm /usr/local/bin
