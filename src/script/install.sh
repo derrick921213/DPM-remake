@@ -14,7 +14,7 @@ if [ "$?" != '0' ]; then
     echo "make Error"
     exit 1
 fi
-activate-global-python-argcomplete --user
+activate-global-python-argcomplete
 activate_pyzshcomplete
 cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
