@@ -1,23 +1,20 @@
 #!/bin/bash
 #__author__:derrick921213
-export PATH="~/.local/bin:$PATH"
-py=$(python3 -c "import os" >/dev/null)
-
+cd /tmp
+pip3 install argcomplete pyzshcomplete
+git clone https://github.com/derrick921213/DPM-remake.git DPM_SRC
 if [ "$?" != '0' ]; then
-    echo "Python not install"
+    echo "git Error"
     exit 1
 fi
-pip3 install --user pyinstaller requests argcomplete pyzshcomplete
+cd DPM_SRC
+make install
+if [ "$?" != '0' ]; then
+    echo "make Error"
+    exit 1
+fi
 activate-global-python-argcomplete --user
 activate_pyzshcomplete
-curl -H "Cache-Control: no-cache" -o dpm.py https://raw.githubusercontent.com/derrick921213/Derrick_package_manager-DPM-/main/dpm.py?$(date +%s)
-pyinstaller -F dpm.py >/dev/null 2>&1
-if [ "$?" != "0" ]; then
-    echo "Install Error!!"
-    exit 1
-fi
-sudo mv dist/dpm /usr/local/bin
-sudo rm -rf __pycache__ dist build dpm.spec dpm.py
 cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
 echo 'export PATH="~/.local/bin:$PATH"' >>~/.zshrc

@@ -33,5 +33,5 @@ install: dev
 	deactivate && \
 	mv build/dpm ../../ && \
 	cd / && \
-	rm -rf /usr/local/DPM/TEMP/DPM_SRC && \
+	rm -rf $(shell pwd) && \
 	ln -s /usr/local/DPM/dpm /usr/local/bin
