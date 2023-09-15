@@ -146,9 +146,11 @@ class Action:
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-        p = subprocess.Popen(["make upgrade"], shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE,cwd=GIT_PATH)
-        std_out, std_err = p.communicate()
-        print(std_out.strip(), std_err)
+        subprocess.Popen(["make upgrade"], shell=True,cwd=GIT_PATH)
+        print("TEST")
+        sys.exit(0)
+        # std_out, std_err = p.communicate()
+        # print(std_out.strip(), std_err)
 class Download:
     
     def read_package_list(self, *args,**kwargs):
