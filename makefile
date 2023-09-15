@@ -27,4 +27,4 @@ upgrade: dev
 	ln -s /usr/local/DPM/dpm /usr/local/bin && \
 	echo "請按下enter結束"
 install: 
-	@cd /tmp && echo $(shell pwd)
+	@cd /tmp && echo $(VENV_ACTIVATE)
