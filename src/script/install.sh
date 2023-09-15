@@ -20,7 +20,7 @@ cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
 sed -i '1i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
 sed -i '1i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
-sed -i '1i\eval "$(register-python-argcomplete dpm)"' ~/.zshrc
+sed -i '1i\eval "$(register-python-argcomplete3 dpm)"' ~/.zshrc
 sed -i '1i\export PATH="~/.local/bin:$PATH"' ~/.bashrc
 sed -i '1i\eval "$(register-python-argcomplete dpm)"' ~/.bashrc
 echo [DPM] Install successful.
