@@ -24,7 +24,6 @@ upgrade: dev
 install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
-	version = $(shell sudo $(PYTHON) $(SRC)/main.py version)
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mkdir -p /usr/local/DPM/TEMP && \
