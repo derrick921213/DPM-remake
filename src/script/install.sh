@@ -3,6 +3,9 @@
 cd /tmp
 sudo apt update -y && sudo apt install python3-venv patchelf software-properties-common git -y
 sudo pip3 install argcomplete pyzshcomplete
+if [ -d "DPM_SRC" ]; then
+    rm -rf "DPM_SRC"
+fi
 git clone https://github.com/derrick921213/DPM-remake.git DPM_SRC
 if [ "$?" != '0' ]; then
     echo "git Error"
