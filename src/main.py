@@ -5,7 +5,7 @@ from argparse import RawTextHelpFormatter
 import argcomplete as _auto
 import pyzshcomplete as _auto_zsh
 from sys import platform as plat
-import sys,os,json,wget,subprocess,requests,tarfile,shutil,git
+import sys,os,json,wget,subprocess,requests,tarfile,shutil,git,atexit
 from urllib.request import urlopen
 from io import BytesIO
 from colorama import Fore, Style
@@ -141,12 +141,13 @@ class Action:
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
             print(kwargs['NotMy'])
-    
+    def after(self, **kwargs):
+        subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
     def update(self, **kwargs):
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-        subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
+        atexit.register(self.after)
         sys.exit(0)
         # std_out, std_err = p.communicate()
         # print(std_out.strip(), std_err)

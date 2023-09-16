@@ -238,39 +238,69 @@
 #         self.pbar.refresh()
 
 # git.Repo.clone_from("https://github.com/derrick921213/DPM-remake.git", "DPM_SRC", branch='main', progress=CloneProgress())
-import os
-import shutil
-import git
-import subprocess
+# import os
+# import shutil
+# import git
+# import subprocess
+# import sys
+
+# def update():
+#     # 定义一些路径和参数
+#     GIT_PATH = '/path/to/your/git/repo'
+#     BACKUP_PATH = '/path/to/backup/directory'
+#     repo_url = 'https://github.com/derrick921213/DPM-remake.git'
+
+#     try:
+#         # 备份旧版本代码
+#         if os.path.exists(BACKUP_PATH):
+#             shutil.rmtree(BACKUP_PATH)
+#         shutil.copytree(GIT_PATH, BACKUP_PATH)
+
+#         # 下载新版本代码
+#         git.Repo.clone_from(repo_url, GIT_PATH, branch='main')
+
+#         # 重启程序
+#         subprocess.Popen([sys.executable] + sys.argv)
+
+#         # 退出当前程序
+#         sys.exit(0)
+#     except Exception as e:
+#         print(f"更新失败: {str(e)}")
+#         # 在更新失败时，你可以回滚到备份的旧版本
+#         if os.path.exists(BACKUP_PATH):
+#             shutil.rmtree(GIT_PATH)
+#             shutil.copytree(BACKUP_PATH, GIT_PATH)
+#         sys.exit(1)
+
+# if __name__ == "__main__":
+#     update()
+
+#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+
+"""
+Play with atexit
+"""
+
+import atexit
 import sys
 
-def update():
-    # 定义一些路径和参数
-    GIT_PATH = '/path/to/your/git/repo'
-    BACKUP_PATH = '/path/to/backup/directory'
-    repo_url = 'https://github.com/derrick921213/DPM-remake.git'
+print('enter script')
 
-    try:
-        # 备份旧版本代码
-        if os.path.exists(BACKUP_PATH):
-            shutil.rmtree(BACKUP_PATH)
-        shutil.copytree(GIT_PATH, BACKUP_PATH)
+# do something
+print('do something')
 
-        # 下载新版本代码
-        git.Repo.clone_from(repo_url, GIT_PATH, branch='main')
+def _leave_0():
+    print('exit script 0')
 
-        # 重启程序
-        subprocess.Popen([sys.executable] + sys.argv)
 
-        # 退出当前程序
-        sys.exit(0)
-    except Exception as e:
-        print(f"更新失败: {str(e)}")
-        # 在更新失败时，你可以回滚到备份的旧版本
-        if os.path.exists(BACKUP_PATH):
-            shutil.rmtree(GIT_PATH)
-            shutil.copytree(BACKUP_PATH, GIT_PATH)
-        sys.exit(1)
+def _leave_1(*args):
+    print('args:', args)
+    print('exit script 1')
 
-if __name__ == "__main__":
-    update()
+
+atexit.register(_leave_0)
+atexit.register(_leave_1, *sys.argv)
+
+if len(sys.argv) < 2:
+    atexit.unregister(_leave_1)
