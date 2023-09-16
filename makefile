@@ -9,12 +9,10 @@ IVERSION ?= $(shell sudo python $(SRC)/main.py version)
 help:
 	@echo "make dev"
 	@echo "       prepare development environment, use only once"
-	@echo "make clean"
-	@echo "       clean python cache files"
-	@echo "make build"
-	@echo "       build DPM executable"
-	@echo "make venv"
-	@echo "       Shell in to venv"
+	@echo "make install"
+	@echo "       Install DPM"
+	@echo "make upgrade"
+	@echo "       Upgrade DPM"
 dev:
 	@python3 -m venv venv
 upgrade: dev
