@@ -154,7 +154,7 @@ class Action:
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-        if not Shell().runcmd(f"sudo -H make upgrade VERSION={VERSION}",verbose=True,cwd=GIT_PATH):
+        if not Shell().runcmd(f"sudo make upgrade VERSION={VERSION}",verbose=True,cwd=GIT_PATH):
             raise Error(f'{Fore.RED}Something Wrong!{Style.RESET_ALL}')
         
         pattern = r'^dpm\..*'
