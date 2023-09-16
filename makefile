@@ -1,9 +1,10 @@
-.PHONY: help dev upgrade
+.PHONY: help dev upgrade debug
 VENV_NAME?=venv
 VENV_ACTIVATE=$(shell pwd)/$(VENV_NAME)/bin/activate
 PYTHON=${VENV_NAME}/bin/python3
 SRC=src
 VERSION ?= V0
+IVERSION ?= $(shell sudo python $(SRC)/main.py version)
 .DEFAULT: help
 help:
 	@echo "make dev"
@@ -26,10 +27,10 @@ install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	version = $(shell sudo $(PYTHON) $(SRC)/main.py version)
-	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(version) && \
+	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mkdir -p /usr/local/DPM/TEMP && \
-	mv build/dpm.$(version) /usr/local/DPM/ && \
+	mv build/dpm.$(IVERSION) /usr/local/DPM/ && \
 	cd / && \
 	rm -rf $(shell pwd) && \
-	ln -s /usr/local/DPM/dpm.$(version) /usr/local/bin/dpm
+	ln -s /usr/local/DPM/dpm.$(IVERSION) /usr/local/bin/dpm
