@@ -239,10 +239,17 @@ class Shell:
         )
         # std_out, std_err = process.communicate()
         if kwargs.get('verbose',False):
+            while True:
+                return_code = process.poll()
+                if return_code is not None:
+                    break
+                line = process.stdout.readline().strip()
+                if line:
+                    print(line)
             # print(std_out.strip(), std_err)
-            for line in iter(process.stdout.readline, b''):
-                if process.returncode==0: break
-                print(line.strip())
+            # for line in iter(process.stdout.readline, b''):
+            #     if process.returncode==0: break
+            #     print(line.strip())
         if kwargs.get('returncode',False):
             return process.returncode
         else:
