@@ -146,8 +146,7 @@ class Action:
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-        subprocess.Popen(["make upgrade"], shell=True,cwd=GIT_PATH)
-        print("TEST")
+        subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
         sys.exit(0)
         # std_out, std_err = p.communicate()
         # print(std_out.strip(), std_err)
