@@ -162,15 +162,11 @@ class Action:
         matching_files = [file for file in files if re.match(pattern, file)]
         if not matching_files:
             raise Error(f'{Fore.RED}No found dpm version!{Style.RESET_ALL}')
-        # p = subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
-        # std_out, std_err = p.communicate()
-        # print(std_out.strip(), std_err)
         max_version = max(matching_files, key=lambda version: (version, compare_versions('dpm.V0',version)))
         if os.path.islink(os.path.join(BIN_DIR,'dpm')):
             os.unlink(os.path.join(BIN_DIR,'dpm'))
         os.symlink(os.path.join(INSTALL_DIR,max_version),os.path.join(BIN_DIR,'dpm'))
         shutil.rmtree(GIT_PATH)
-        print("最大版本号:", max_version)
         print("Success Upgrade!")
 class Download:
     
