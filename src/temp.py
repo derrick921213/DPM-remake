@@ -311,24 +311,29 @@
 #     f.seek(0)
 #     f.write(text)
 #     f.truncate()
-import re
+# import re
 
-def compare_versions(version1, version2):
-    # 使用正则表达式从版本号字符串中提取数字部分
-    pattern = r'\d+'
-    v1_numbers = [int(match) for match in re.findall(pattern, version1)]
-    v2_numbers = [int(match) for match in re.findall(pattern, version2)]
-    ret = 0
-    if v1_numbers < v2_numbers:
-        ret=1
-    elif v1_numbers > v2_numbers:
-        ret=-1
-    return ret
+# def compare_versions(version1, version2):
+#     # 使用正则表达式从版本号字符串中提取数字部分
+#     pattern = r'\d+'
+#     v1_numbers = [int(match) for match in re.findall(pattern, version1)]
+#     v2_numbers = [int(match) for match in re.findall(pattern, version2)]
+#     ret = 0
+#     if v1_numbers < v2_numbers:
+#         ret=1
+#     elif v1_numbers > v2_numbers:
+#         ret=-1
+#     return ret
 
-# 给定版本号列表
-versions = ['dpm.V1', 'dpm.V2', 'dpm.V3']
+# # 给定版本号列表
+# versions = ['dpm.V1', 'dpm.V2', 'dpm.V3']
 
-# 使用自定义比较函数找到最大值
-max_version = max(versions, key=lambda version: (version, compare_versions(version, 'dpm.V0')))
+# # 使用自定义比较函数找到最大值
+# max_version = max(versions, key=lambda version: (version, compare_versions(version, 'dpm.V0')))
 
-print("最大版本号:", max_version)
+# print("最大版本号:", max_version)
+import os 
+BIN_DIR = '/usr/local/bin'
+if os.path.islink(os.path.join(BIN_DIR,'dpm')):
+    os.unlink(os.path.join(BIN_DIR,'dpm'))
+    # print('OK')
