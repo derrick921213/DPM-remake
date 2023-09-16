@@ -5,24 +5,31 @@ from argparse import RawTextHelpFormatter
 import argcomplete as _auto
 import pyzshcomplete as _auto_zsh
 from sys import platform as plat
-import sys,os,json,wget,subprocess,requests,tarfile,shutil,git,atexit
+import sys,os,json,wget,subprocess,requests,tarfile,shutil,git,re
 from urllib.request import urlopen
 from io import BytesIO
 from colorama import Fore, Style
 from git import RemoteProgress
 from tqdm import tqdm
-import time
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/local/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC' 
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
+VERSION = 'V1'
 
-def prompt_sudo():
-    ret:bool = True
-    if os.geteuid() != 0:
-        ret = False
+def compare_versions(old, new,pattern = r'\d+'):
+    old_v = [int(match) for match in re.findall(pattern, old)]
+    new_v = [int(match) for match in re.findall(pattern, new)]
+    ret = 0
+    if old_v < new_v:
+        ret=1
+    elif old_v > new_v:
+        ret=-1
     return ret
+    # return True if [int(match) for match in re.findall(pattern, old)] < [int(match) for match in re.findall(pattern, new)] else False
+def prompt_sudo():
+    return True if os.geteuid() == 0 else False 
 class CloneProgress(RemoteProgress):
     def __init__(self):
         super().__init__()
@@ -38,7 +45,8 @@ class Error(Exception):
     def __str__(self) -> str:
         return self.message
 class Action:
-    
+    def show_version(self,**kwargs):
+        raise Error(VERSION)
     def installed_package_list(self, **kwargs) -> list[str]:
         installed_package = []
         try:
@@ -141,16 +149,25 @@ class Action:
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
             print(kwargs['NotMy'])
-    def after(self, **kwargs):
-        subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
+    
     def update(self, **kwargs):
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-        atexit.register(self.after)
-        sys.exit(0)
+        if not Shell().runcmd(f"sudo -H make upgrade VERSION={VERSION}",verbose=True,cwd=GIT_PATH):
+            raise Error(f'{Fore.RED}Something Wrong!{Style.RESET_ALL}')
+        
+        pattern = r'^dpm\..*'
+        files = os.listdir(INSTALL_DIR)
+        matching_files = [file for file in files if re.match(pattern, file)]
+        if not matching_files:
+            raise Error(f'{Fore.RED}No found dpm version!{Style.RESET_ALL}')
+        # p = subprocess.Popen(["sudo make upgrade"], shell=True,cwd=GIT_PATH)
         # std_out, std_err = p.communicate()
         # print(std_out.strip(), std_err)
+        max_version = max(matching_files, key=lambda version: (version, compare_versions('dpm.V0',version)))
+        print("最大版本号:", max_version)
+        print("Success Upgrade!")
 class Download:
     
     def read_package_list(self, *args,**kwargs):
@@ -217,11 +234,14 @@ class Shell:
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
             text = True,
-            shell = True
+            shell = True,
+            cwd=kwargs.get('cwd',None)
         )
-        std_out, std_err = process.communicate()
+        # std_out, std_err = process.communicate()
         if kwargs.get('verbose',False):
-            print(std_out.strip(), std_err)
+            # print(std_out.strip(), std_err)
+            for line in iter(process.stdout.readline, b''):
+                print(line.decode('utf-8').strip())
         if kwargs.get('returncode',False):
             return process.returncode
         else:
@@ -373,7 +393,8 @@ class Main:
                 download.read_package_list
             ],
             "update": action.install_update,
-            "upgrade": action.update
+            "upgrade": action.update,
+            "version": action.show_version
         }
         func_args = {
             'package': args.package,
@@ -396,13 +417,12 @@ class Main:
             self.FUNC.get(args.commands)(**func_args)
 
 if __name__ == '__main__':
-    start_time = time.time()
     parser = _arg.ArgumentParser(
         prog="dpm", description="DPM is a package manager", formatter_class=RawTextHelpFormatter, epilog="Further help: \n  https://github.com/derrick921213/DPM-remake/")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", action="store_true", help="開啟囉唆模式")
     parser.add_argument("commands",  choices=('search', 'install', 'list',
-                        'uninstall', 'update','upgrade'), help="Choose one command to execute!")
+                        'uninstall', 'update','upgrade','version'), help="Choose one command to execute!")
     parser.add_argument("package", nargs='*',
                         help="Wants to use packages or command")
     _auto.autocomplete(parser)
@@ -416,6 +436,5 @@ if __name__ == '__main__':
         if not os.path.isdir(DOWNLOAD_TEMP):
             Shell().runcmd(f'mkdir -p {DOWNLOAD_TEMP}')
         Main(args)
-        print('Time used: {} sec'.format(time.time()-start_time))
     except Error as e:
         print(e.message)
