@@ -166,6 +166,10 @@ class Action:
         # std_out, std_err = p.communicate()
         # print(std_out.strip(), std_err)
         max_version = max(matching_files, key=lambda version: (version, compare_versions('dpm.V0',version)))
+        if os.path.exists(os.path.join(BIN_DIR,'dpm')):
+            os.unlink(os.path.join(BIN_DIR,'dpm'))
+        os.symlink(os.path.join(INSTALL_DIR,max_version),os.path.join(BIN_DIR,'dpm'))
+        shutil.rmtree(GIT_PATH)
         print("最大版本号:", max_version)
         print("Success Upgrade!")
 class Download:
@@ -237,7 +241,6 @@ class Shell:
             shell = True,
             cwd=kwargs.get('cwd',None)
         )
-        # std_out, std_err = process.communicate()
         if kwargs.get('verbose',False):
             while True:
                 return_code = process.poll()
@@ -246,10 +249,6 @@ class Shell:
                 line = process.stdout.readline().strip()
                 if line:
                     print(line)
-            # print(std_out.strip(), std_err)
-            # for line in iter(process.stdout.readline, b''):
-            #     if process.returncode==0: break
-            #     print(line.strip())
         if kwargs.get('returncode',False):
             return process.returncode
         else:
