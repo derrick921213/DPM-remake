@@ -241,7 +241,8 @@ class Shell:
         if kwargs.get('verbose',False):
             # print(std_out.strip(), std_err)
             for line in iter(process.stdout.readline, b''):
-                print(line.decode('utf-8').strip())
+                if process.returncode==0: break
+                print(line.strip())
         if kwargs.get('returncode',False):
             return process.returncode
         else:
