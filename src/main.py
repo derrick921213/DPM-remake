@@ -57,7 +57,6 @@ class Action:
         except FileNotFoundError: raise Error(f'{Fore.RED}未安裝 DPM 無法顯示已安裝軟體!{Style.RESET_ALL}')
         if len(installed_package) > 0: [print(e) for e in installed_package if kwargs.get('verbose')];return installed_package 
         else: raise Error(f'{Fore.RED}嘗試安裝軟體後再試一次{Style.RESET_ALL}')
-    
     def extract_all_files(self,tar_file_path, extract_to): 
         with tarfile.open(tar_file_path, mode='r:gz') as tar: tar.extractall(extract_to)
     def install_update(self, package, verbose=False):
@@ -101,7 +100,6 @@ class Action:
                 else:
                     print('Package Error')
                     sys.exit(1)
-    
     def install(self, **kwargs):
         download:'Download' = Download()
         shell:'Shell' = Shell()
@@ -127,7 +125,6 @@ class Action:
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
             print(kwargs['NotMy'])
-    
     def uninstall(self, **kwargs):
         download:'Download' = Download()
         shell:'Shell' = Shell()
@@ -149,7 +146,6 @@ class Action:
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
             print(kwargs['NotMy'])
-    
     def update(self, **kwargs):
         repo_url = 'https://github.com/derrick921213/DPM-remake.git'
         os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
@@ -169,7 +165,6 @@ class Action:
         shutil.rmtree(GIT_PATH)
         print("Success Upgrade!")
 class Download:
-    
     def read_package_list(self, *args,**kwargs):
         data_json = self.package_list()
         if len(args)==0:
@@ -192,7 +187,6 @@ class Download:
                 return data_json[args[0]]["url"]
             else:
                 raise Error(f'{Fore.YELLOW}[{args[0]}]{Style.RESET_ALL} {Fore.RED}not found!!{Style.RESET_ALL}')
-    
     def read_package_info(self, package,**kwargs):
         if package in Action().installed_package_list(verbose=False):
             with open(f'{os.path.join(kwargs.get("path",None),package)}/package.json','r') as f:
@@ -211,7 +205,6 @@ class Download:
                     return package_data
         else:
             raise Error(f'{Fore.RED}Failed to fetch the tgz file.{Style.RESET_ALL}')
-    
     def package_list(self,**kwargs):
         import ssl
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -220,23 +213,14 @@ class Download:
         data = json.loads(response.read())
         response.close()
         return data
-    
     def download_file(self, url):
         filename = url.split('/')[-1]
         wget.download(url,os.path.join(DOWNLOAD_TEMP,filename))
         print(f'{Fore.GREEN}{filename:>20}{Style.RESET_ALL}')
         return filename
 class Shell:
-    
     def runcmd(self,cmd:str, **kwargs:dict):
-        process = subprocess.Popen(
-            cmd,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            text = True,
-            shell = True,
-            cwd=kwargs.get('cwd',None)
-        )
+        process = subprocess.Popen(cmd,stdout = subprocess.PIPE,stderr = subprocess.PIPE,text = True,shell = True,cwd=kwargs.get('cwd',None))
         if kwargs.get('verbose',False):
             while True:
                 return_code = process.poll()
@@ -254,7 +238,6 @@ class Shell:
             print('Platform_Error:This application only on Linux or Mac')
             sys.exit(1)
         return 'linux' if plat == 'linux' else 'darwin'
-
     def linux_shell(self, package, install=False, uninstall=False, update=False, verbose=False):
         if install is True and uninstall is False and update is False:
             if os.system("which apt >/dev/null") == 0:
@@ -343,7 +326,6 @@ class Shell:
         else:
             print("Application Error")
             sys.exit(1)
-
     def mac_shell(self, package, install=False, uninstall=False, update=False, verbose=False):
         if install is True and uninstall is False and update is False:
             if os.system("which brew >/dev/null") == 0:
@@ -383,7 +365,6 @@ class Shell:
             print("Application Error")
             sys.exit(1)
 class Main:
-    
     def __init__(self,args):
         action = Action()
         download = Download()
@@ -420,14 +401,11 @@ class Main:
             self.FUNC.get(args.commands)(**func_args)
 
 if __name__ == '__main__':
-    parser = _arg.ArgumentParser(
-        prog="dpm", description="DPM is a package manager", formatter_class=RawTextHelpFormatter, epilog="Further help: \n  https://github.com/derrick921213/DPM-remake/")
+    parser = _arg.ArgumentParser(prog="dpm", description="DPM is a package manager", formatter_class=RawTextHelpFormatter, epilog="Further help: \n  https://github.com/derrick921213/DPM-remake/")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--verbose", action="store_true", help="開啟囉唆模式")
-    parser.add_argument("commands",  choices=('search', 'install', 'list',
-                        'uninstall', 'update','upgrade','version'), help="Choose one command to execute!")
-    parser.add_argument("package", nargs='*',
-                        help="Wants to use packages or command")
+    parser.add_argument("commands",  choices=('search', 'install', 'list','uninstall', 'update','upgrade','version'), help="Choose one command to execute!")
+    parser.add_argument("package", nargs='*',help="Wants to use packages or command")
     _auto.autocomplete(parser)
     _auto_zsh.autocomplete(parser)
     args = parser.parse_args()
