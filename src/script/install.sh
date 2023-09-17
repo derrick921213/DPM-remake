@@ -26,5 +26,5 @@ sed -i '9i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
 sed -i '10i\autoload -U compinit; compinit' ~/.zshrc
 sed -i '11i\eval "$(register-python-argcomplete3 dpm)"' ~/.zshrc
 echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
-echo 'eval "$(register-python-argcomplete dpm)"'>> ~/.bashrc
+echo 'eval "$(register-python-argcomplete3 dpm)"'>> ~/.bashrc
 echo [DPM] Install successful.
