@@ -13,7 +13,7 @@ from git import RemoteProgress
 from tqdm import tqdm
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
-BIN_DIR = '/usr/local/bin'
+BIN_DIR = '/usr/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC'
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
 VERSION = 'V1'
