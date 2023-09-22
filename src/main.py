@@ -171,11 +171,14 @@ class Action:
             print(kwargs['NotMy'])
     def update(self, **kwargs):
         old_version = Shell().runcmd(f'sudo dpm version',verbose=True,ret=True)
-        response = requests.get(url)
-        new_version = 
-        repo_url = 'https://github.com/derrick921213/DPM-remake.git'
-        os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
-        git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
+        response = requests.get("https://raw.githubusercontent.com/derrick921213/DPM-remake/main/VERSION")
+        if response.status_code == 200:
+        # 输出网页内容
+            print(response.text)
+        # new_version = 
+        # repo_url = 'https://github.com/derrick921213/DPM-remake.git'
+        # os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
+        # git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
 
         # compare_versions('dpm.V0',version)
         
