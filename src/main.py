@@ -16,7 +16,7 @@ DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/local/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC'
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
-VERSION = 'V1'
+VERSION = 'V2'
 
 def compare_versions(old, new,pattern = r'\d+'):
     old_v = [int(match) for match in re.findall(pattern, old)]
@@ -413,7 +413,6 @@ class Main:
                 if 'list' in func_args['package'][0] or 'ls' in func_args['package'][0]:
                     del func_args['package'][0]
                     result = self.FUNC.get(args.commands)[0](**func_args)
-                    print(result)
                     msg = "Description"
                     print(f"{Fore.YELLOW}Name{Style.RESET_ALL}\t{Fore.GREEN}{msg:>25s}{Style.RESET_ALL}")
                     print(f'{Fore.GREEN}---------------{Style.RESET_ALL}')
