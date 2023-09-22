@@ -16,7 +16,7 @@ DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/local/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC'
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
-VERSION = 'V2'
+VERSION = 'V1'
 
 def compare_versions(old, new,pattern = r'\d+'):
     old_v = [int(match) for match in re.findall(pattern, old)]
@@ -171,29 +171,29 @@ class Action:
             print(kwargs['NotMy'])
     def update(self, **kwargs):
         old_version = Shell().runcmd(f'sudo dpm version',verbose=True,ret=True)
-        # old_version = "V2"
         response = requests.get("https://raw.githubusercontent.com/derrick921213/DPM-remake/main/VERSION.txt")
         if response.status_code == 200:
             new_version =  response.text
+        print(type(new_version))
         if compare_versions(old_version,new_version) == 1:
-            repo_url = 'https://github.com/derrick921213/DPM-remake.git'
-            os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
-            git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
-            if not Shell().runcmd(f"sudo make upgrade",verbose=True,cwd=GIT_PATH):
-                raise Error(f'{Fore.RED}Something Wrong!{Style.RESET_ALL}')
-            pattern = r'^dpm\..*'
-            files = os.listdir(INSTALL_DIR)
-            matching_files = [file for file in files if re.match(pattern, file)]
-            if not matching_files:
-                raise Error(f'{Fore.RED}No found dpm version!{Style.RESET_ALL}')
-            max_version = max(matching_files, key=lambda version: (version, compare_versions('dpm.V0',version)))
-            if os.path.islink(os.path.join(BIN_DIR,'dpm')):
-                os.unlink(os.path.join(BIN_DIR,'dpm'))
-            os.symlink(os.path.join(INSTALL_DIR,max_version),os.path.join(BIN_DIR,'dpm'))
-            shutil.rmtree(GIT_PATH)
-            print("Success Upgrade!")
-        else:
-            raise Error(f'{Fore.GREEN}This is Newest!!{Style.RESET_ALL}')
+        #     repo_url = 'https://github.com/derrick921213/DPM-remake.git'
+        #     os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
+        #     git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
+        #     if not Shell().runcmd(f"sudo make upgrade",verbose=True,cwd=GIT_PATH):
+        #         raise Error(f'{Fore.RED}Something Wrong!{Style.RESET_ALL}')
+        #     pattern = r'^dpm\..*'
+        #     files = os.listdir(INSTALL_DIR)
+        #     matching_files = [file for file in files if re.match(pattern, file)]
+        #     if not matching_files:
+        #         raise Error(f'{Fore.RED}No found dpm version!{Style.RESET_ALL}')
+        #     max_version = max(matching_files, key=lambda version: (version, compare_versions('dpm.V0',version)))
+        #     if os.path.islink(os.path.join(BIN_DIR,'dpm')):
+        #         os.unlink(os.path.join(BIN_DIR,'dpm'))
+        #     os.symlink(os.path.join(INSTALL_DIR,max_version),os.path.join(BIN_DIR,'dpm'))
+        #     shutil.rmtree(GIT_PATH)
+        #     print("Success Upgrade!")
+        # else:
+        #     raise Error(f'{Fore.GREEN}This is Newest!!{Style.RESET_ALL}')
 class Download:
     def read_package_list(self, *args,**kwargs):
         data_json = self.package_list()
