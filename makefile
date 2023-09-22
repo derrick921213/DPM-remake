@@ -18,9 +18,9 @@ dev:
 upgrade: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
-	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(VERSION) && \
+	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
-	mv build/dpm.$(VERSION) ../../
+	mv build/dpm.$(IVERSION) ../../
 install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
