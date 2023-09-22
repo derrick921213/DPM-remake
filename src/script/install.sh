@@ -11,11 +11,12 @@ os_release_info=$(cat /etc/os-release)
 os_like=$(echo "$os_release_info" | grep -o 'ID_LIKE=.*' | cut -d'=' -f2 | sed 's/"//g')
 os_like2=($os_like)
 if exists_in_list "$os_like" " " debian; then
-   sudo apt update -y && sudo apt install python3-venv patchelf software-properties-common git -y
+    sudo apt update -y && sudo apt install build-essential python3-venv patchelf software-properties-common git -y
 elif exists_in_list "$os_like" " " rhel; then
-   sudo dnf update -y && sudo dnf install python3 git -y
+    sudo dnf groupinstall "Development Tools" -y
+    sudo dnf update -y && sudo dnf install python3 git -y
 else
-   exit 1
+    exit 1
 fi
 
 sudo pip3 install argcomplete pyzshcomplete
