@@ -37,19 +37,26 @@ fi
 if exists_in_list "$os_like" " " debian; then
     sudo activate-global-python-argcomplete3
     yes | activate_pyzshcomplete
+    cp ~/.zshrc ~/.zshrc.bak
+    cp ~/.bashrc ~/.bashrc.bak
+    sed -i '8i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
+    sed -i '9i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
+    sed -i '10i\autoload -U compinit; compinit' ~/.zshrc
+    sed -i '11i\eval "$(register-python-argcomplete3 dpm)"' ~/.zshrc
+    echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
+    echo 'eval "$(register-python-argcomplete3 dpm)"'>> ~/.bashrc
 elif exists_in_list "$os_like" " " rhel; then
     sudo activate-global-python-argcomplete
     yes | activate_pyzshcomplete
+    cp ~/.zshrc ~/.zshrc.bak
+    cp ~/.bashrc ~/.bashrc.bak
+    sed -i '8i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
+    sed -i '9i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
+    sed -i '10i\autoload -U compinit; compinit' ~/.zshrc
+    sed -i '11i\eval "$(register-python-argcomplete dpm)"' ~/.zshrc
+    echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
+    echo 'eval "$(register-python-argcomplete dpm)"'>> ~/.bashrc
 else
     exit 1
 fi
-
-cp ~/.zshrc ~/.zshrc.bak
-cp ~/.bashrc ~/.bashrc.bak
-sed -i '8i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
-sed -i '9i\autoload -U bashcompinit;bashcompinit' ~/.zshrc
-sed -i '10i\autoload -U compinit; compinit' ~/.zshrc
-sed -i '11i\eval "$(register-python-argcomplete3 dpm)"' ~/.zshrc
-echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
-echo 'eval "$(register-python-argcomplete3 dpm)"'>> ~/.bashrc
 echo [DPM] Install successful.
