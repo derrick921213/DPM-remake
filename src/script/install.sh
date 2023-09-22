@@ -46,7 +46,7 @@ if exists_in_list "$os_like" " " debian; then
     echo 'export PATH="~/.local/bin:$PATH"'  >> ~/.bashrc
     echo 'eval "$(register-python-argcomplete3 dpm)"'>> ~/.bashrc
 elif exists_in_list "$os_like" " " rhel; then
-    sudo activate-global-python-argcomplete
+    activate-global-python-argcomplete
     yes | activate_pyzshcomplete
     cp ~/.zshrc ~/.zshrc.bak
     cp ~/.bashrc ~/.bashrc.bak
