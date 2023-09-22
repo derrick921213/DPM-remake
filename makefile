@@ -4,7 +4,7 @@ VENV_ACTIVATE=$(shell pwd)/$(VENV_NAME)/bin/activate
 PYTHON=${VENV_NAME}/bin/python3
 SRC=src
 VERSION ?= V0
-IVERSION ?= $(shell sudo python $(SRC)/main.py version)
+IVERSION ?= V0 
 .DEFAULT: help
 help:
 	@echo "make dev"
@@ -30,4 +30,4 @@ install: dev
 	mv build/dpm.$(IVERSION) /usr/local/DPM/ && \
 	cd / && \
 	rm -rf $(shell pwd) && \
-	ln -s /usr/local/DPM/dpm.$(IVERSION) /usr/local/bin/dpm
+	ln -s /usr/local/DPM/dpm.$(IVERSION) /usr/bin/dpm
