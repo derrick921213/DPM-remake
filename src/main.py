@@ -14,7 +14,7 @@ from tqdm import tqdm
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/local/bin'
-GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC' 
+GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC'
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
 VERSION = 'V1'
 
@@ -28,8 +28,19 @@ def compare_versions(old, new,pattern = r'\d+'):
         ret=-1
     return ret
     # return True if [int(match) for match in re.findall(pattern, old)] < [int(match) for match in re.findall(pattern, new)] else False
-def prompt_sudo():
-    return True if os.geteuid() == 0 else False 
+def compare_software_version(old: str, new: str) -> bool:
+    old_list = list(map(int, old.split('.')))
+    new_list = list(map(int, new.split('.')))
+    if len(old_list) < 3 or len(new_list) < 3:
+        raise ValueError(f'{Fore.RED}Software version wrong!{Style.RESET_ALL}')
+    for old_num, new_num in zip(old_list, new_list):
+        if old_num < new_num:
+            return True
+    return False
+
+
+def check_sudo():
+    return True if os.geteuid() == 0 else False
 class CloneProgress(RemoteProgress):
     def __init__(self):
         super().__init__()
@@ -51,55 +62,67 @@ class Action:
         installed_package = []
         try:
             for e in os.listdir('/usr/local/DPM'):
-                if e == 'TEMP' or e=='dpm' :
+                if e == 'TEMP' or e.startswith('dpm.') :
                     continue
                 installed_package.append(e)
         except FileNotFoundError: raise Error(f'{Fore.RED}未安裝 DPM 無法顯示已安裝軟體!{Style.RESET_ALL}')
-        if len(installed_package) > 0: [print(e) for e in installed_package if kwargs.get('verbose')];return installed_package 
+        if len(installed_package) > 0: [print(e) for e in installed_package if kwargs.get('verbose')];return installed_package
         else: raise Error(f'{Fore.RED}嘗試安裝軟體後再試一次{Style.RESET_ALL}')
-    def extract_all_files(self,tar_file_path, extract_to): 
+    def extract_all_files(self,tar_file_path, extract_to):
         with tarfile.open(tar_file_path, mode='r:gz') as tar: tar.extractall(extract_to)
-    def install_update(self, package, verbose=False):
-        if verbose:
-            if os.path.isdir(f"/usr/local/DPM/{package}") and os.path.isfile(f"/usr/local/bin/{package}"):
-                error = os.system(
-                    f'sudo rm -rf /usr/local/bin/{package} /usr/local/DPM/{package}')
-                if error == 0:
-                    local = os.system(
-                        f"sudo mkdir -p /usr/local/DPM/{package};sudo chown -R $USER /usr/local/DPM/*")
-                    if local == 0:
-                        file = os.system(f"cd /tmp;ls | grep '^dpm_{package}'")
-                        if file == 0:
-                            download = Download()
-                            info = download.read_package_info(package)
-                            os.system(
-                                f"temp=/tmp;a=`ls $temp | grep '^dpm_{package}'`;tar -xf $temp/$a -C /usr/local/DPM/{package};sudo chmod -R 555 /usr/local/DPM/*;sudo ln -s /usr/local/DPM/{package}/{info['main_file']} /usr/local/bin/{package};rm $temp/$a")
-                        else:
-                            print('Package NO Found')
-                            sys.exit(1)
+    def install_update(self, **kwargs):
+        download = Download()
+        is_my:dict = download.package_list()
+        kwargs["NotMy"]:list = []
+        kwargs["My"]:list = [] 
+        [kwargs['NotMy'].append(i) if i not in is_my else kwargs['My'].append(i) for i in kwargs.get('package')]
+        if len(kwargs['package'])==0:
+            all_package = self.installed_package_list()
+            for name in all_package:
+                # print(name)
+                new = download.read_package_info(name,remote=True)["version"]
+                old = download.read_package_info(name,path=INSTALL_DIR)["version"]
+                if compare_software_version(old,new):
+                    print(f'{Fore.GREEN}{name}{Style.RESET_ALL}\t{Fore.RED}{old}{Style.RESET_ALL}\t->\t{Fore.YELLOW}{new}{Style.RESET_ALL}')
+                    [download.download_file(url) for name,url in download.read_package_list(**kwargs).items()]
+                    package_location:str = os.path.join(INSTALL_DIR,name)
+                    if not os.path.exists(os.path.join(INSTALL_DIR,name)):
+                        raise Error(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.RED}Not installed!{Style.RESET_ALL}')
+                    shutil.rmtree(os.path.join(INSTALL_DIR,name))
+                    os.unlink(f'{BIN_DIR}/{name}')
+                    os.mkdir(package_location)
+                    self.extract_all_files(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz'),package_location)
+                    software = os.path.join(package_location,download.read_package_info(name,path=INSTALL_DIR)['main_file'])
+                    os.chmod(software,0o755)
+                    os.symlink(software,f'{BIN_DIR}/{name}')
+                    print(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.BLUE}Update Successed.{Style.RESET_ALL}')
+                    os.unlink(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz'))
                 else:
-                    print('Package Error')
-                    sys.exit(1)
-        if os.path.isdir(f"/usr/local/DPM/{package}") and os.path.isfile(f"/usr/local/bin/{package}"):
-            error = os.system(
-                f'sudo rm -rf /usr/local/bin/{package} /usr/local/DPM/{package} >/dev/null 2>&1')
-            if error == 0:
-                local = os.system(
-                    f"sudo mkdir -p /usr/local/DPM/{package};sudo chown -R $USER /usr/local/DPM/* >/dev/null 2>&1")
-                if local == 0:
-                    file = os.system(
-                        f"cd /tmp;ls | grep '^dpm_{package}' >/dev/null 2>&1")
-                    if file == 0:
-                        download = Download()
-                        info = download.read_package_info(package)
-                        os.system(
-                            f"temp=/tmp;a=`ls $temp | grep '^dpm_{package}'`&&tar -xf $temp/$a -C /usr/local/DPM/{package}&&sudo chmod -R 555 /usr/local/DPM/*&&sudo ln -s /usr/local/DPM/{package}/{info['main_file']} /usr/local/bin/{package}&&rm $temp/$a >/dev/null 2>&1")
-                    else:
-                        print('Package NO Found')
-                        sys.exit(1)
-                else:
-                    print('Package Error')
-                    sys.exit(1)
+                    print(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.GREEN}No need to update{Style.RESET_ALL}')
+            # raise Error(f'{Fore.RED}Not package can update!{Style.RESET_ALL}')
+        else:
+            for name in kwargs['My']:
+                new = download.read_package_info(name,remote=True)["version"]
+                old = download.read_package_info(name,path=INSTALL_DIR)["version"]
+                if compare_software_version(old,new):
+                    print(f'{Fore.GREEN}{name}{Style.RESET_ALL}\t{Fore.RED}{old}{Style.RESET_ALL}\t->\t{Fore.YELLOW}{new}{Style.RESET_ALL}')
+                    [download.download_file(url) for name,url in download.read_package_list(**kwargs).items()]
+                    package_location:str = os.path.join(INSTALL_DIR,name)
+                    if not os.path.exists(os.path.join(INSTALL_DIR,name)):
+                        raise Error(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.RED}Not installed!{Style.RESET_ALL}')
+                    shutil.rmtree(os.path.join(INSTALL_DIR,name))
+                    os.unlink(f'{BIN_DIR}/{name}')
+                    os.mkdir(package_location)
+                    self.extract_all_files(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz'),package_location)
+                    software = os.path.join(package_location,download.read_package_info(name,path=INSTALL_DIR)['main_file'])
+                    os.chmod(software,0o755)
+                    os.symlink(software,f'{BIN_DIR}/{name}')
+                    print(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.BLUE}Update Successed.{Style.RESET_ALL}')
+                    os.unlink(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz'))
+            if len(kwargs['NotMy'])>0:
+                # 進入系統管理包程序
+                print(kwargs['NotMy'])
+
     def install(self, **kwargs):
         download:'Download' = Download()
         shell:'Shell' = Shell()
@@ -112,7 +135,7 @@ class Action:
             [(os.path.exists(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz')) or download.download_file(url)) for name,url in download.read_package_list(**kwargs).items()]
             for i in kwargs["My"]:
                 package_location:str = os.path.join(INSTALL_DIR,i)
-                if os.path.exists(os.path.join(INSTALL_DIR,i)): 
+                if os.path.exists(os.path.join(INSTALL_DIR,i)):
                     print(f'{Fore.YELLOW}{i}{Style.RESET_ALL} {Fore.RED}Package exist!!{Style.RESET_ALL}')
                     continue
                 os.mkdir(package_location)
@@ -152,7 +175,6 @@ class Action:
         git.Repo.clone_from(repo_url, GIT_PATH, branch='main', progress=CloneProgress())
         if not Shell().runcmd(f"sudo make upgrade VERSION={VERSION}",verbose=True,cwd=GIT_PATH):
             raise Error(f'{Fore.RED}Something Wrong!{Style.RESET_ALL}')
-        
         pattern = r'^dpm\..*'
         files = os.listdir(INSTALL_DIR)
         matching_files = [file for file in files if re.match(pattern, file)]
@@ -188,23 +210,25 @@ class Download:
             else:
                 raise Error(f'{Fore.YELLOW}[{args[0]}]{Style.RESET_ALL} {Fore.RED}not found!!{Style.RESET_ALL}')
     def read_package_info(self, package,**kwargs):
-        if package in Action().installed_package_list(verbose=False):
-            with open(f'{os.path.join(kwargs.get("path",None),package)}/package.json','r') as f:
-                package_info = json.load(f)
-                return package_info
-        url = self.read_package_list(package)
-        package_json_path = 'package.json'
-        response = requests.get(url)
-        if response.status_code == 200:
-            tgz_bytes = BytesIO(response.content)
-            with tarfile.open(fileobj=tgz_bytes, mode='r:gz') as tgz:
-                package_json_file = tgz.extractfile(package_json_path)
-                if package_json_file:
-                    package_json_content = package_json_file.read().decode('utf-8')
-                    package_data = json.loads(package_json_content)
-                    return package_data
+        if not kwargs.get('remote',False):
+            if package in Action().installed_package_list(verbose=False):
+                with open(f'{os.path.join(kwargs.get("path",None),package)}/package.json','r') as f:
+                    package_info = json.load(f)
+                    return package_info
         else:
-            raise Error(f'{Fore.RED}Failed to fetch the tgz file.{Style.RESET_ALL}')
+            url = self.read_package_list(package)
+            package_json_path = 'package.json'
+            response = requests.get(url)
+            if response.status_code == 200:
+                tgz_bytes = BytesIO(response.content)
+                with tarfile.open(fileobj=tgz_bytes, mode='r:gz') as tgz:
+                    package_json_file = tgz.extractfile(package_json_path)
+                    if package_json_file:
+                        package_json_content = package_json_file.read().decode('utf-8')
+                        package_data = json.loads(package_json_content)
+                        return package_data
+            else:
+                raise Error(f'{Fore.RED}Failed to fetch the tgz file.{Style.RESET_ALL}')
     def package_list(self,**kwargs):
         import ssl
         ssl._create_default_https_context = ssl._create_unverified_context
@@ -389,9 +413,12 @@ class Main:
                 if 'list' in func_args['package'][0] or 'ls' in func_args['package'][0]:
                     del func_args['package'][0]
                     result = self.FUNC.get(args.commands)[0](**func_args)
+                    print(result)
+                    msg = "Description"
+                    print(f"{Fore.YELLOW}Name{Style.RESET_ALL}\t{Fore.GREEN}{msg:>25s}{Style.RESET_ALL}")
                     print(f'{Fore.GREEN}---------------{Style.RESET_ALL}')
-                    for keys in result.keys():
-                        print(f'{Fore.YELLOW}{keys}{Style.RESET_ALL}')
+                    for keys,vals in result.items():
+                        print(f"{Fore.YELLOW}{keys}{Style.RESET_ALL}\t{Fore.GREEN}{vals['description']:>25s}{Style.RESET_ALL}")
                     print(f"{Fore.GREEN}----{Style.RESET_ALL}{Fore.LIGHTBLUE_EX}These package can install from repository{Style.RESET_ALL}{Fore.GREEN}----{Style.RESET_ALL}")
                 else:
                     self.FUNC.get(args.commands)[1](**func_args)
@@ -410,7 +437,7 @@ if __name__ == '__main__':
     _auto_zsh.autocomplete(parser)
     args = parser.parse_args()
     try:
-        if not prompt_sudo():
+        if not check_sudo():
             raise Error(f"{Fore.RED}無法切換管理員身份{Style.RESET_ALL}")
         if not os.path.isdir(INSTALL_DIR):
             Shell().runcmd(f'mkdir -p {INSTALL_DIR}')

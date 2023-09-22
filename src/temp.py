@@ -332,8 +332,12 @@
 # max_version = max(versions, key=lambda version: (version, compare_versions(version, 'dpm.V0')))
 
 # print("最大版本号:", max_version)
-import os 
-BIN_DIR = '/usr/local/bin'
-if os.path.islink(os.path.join(BIN_DIR,'dpm')):
-    os.unlink(os.path.join(BIN_DIR,'dpm'))
-    # print('OK')
+# import os 
+# BIN_DIR = '/usr/local/bin'
+# if os.path.islink(os.path.join(BIN_DIR,'dpm')):
+#     os.unlink(os.path.join(BIN_DIR,'dpm'))
+#     # print('OK')
+import distro
+
+# dist_info = distro.linux_distribution(full_distribution_name=False)
+print(distro.id(),distro.version(),distro.name())

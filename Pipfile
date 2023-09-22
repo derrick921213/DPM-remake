@@ -12,6 +12,7 @@ colorama = "*"
 gitpython = "*"
 tqdm = "*"
 cprofilev = "*"
+distro = "*"
 
 [dev-packages]
 nuitka = "*"
