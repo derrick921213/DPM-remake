@@ -34,8 +34,16 @@ if [ "$?" != '0' ]; then
     echo "make Error"
     exit 1
 fi
-sudo activate-global-python-argcomplete3
-activate_pyzshcomplete
+if exists_in_list "$os_like" " " debian; then
+    sudo activate-global-python-argcomplete3
+    yes | activate_pyzshcomplete
+elif exists_in_list "$os_like" " " rhel; then
+    sudo activate-global-python-argcomplete
+    yes | activate_pyzshcomplete
+else
+    exit 1
+fi
+
 cp ~/.zshrc ~/.zshrc.bak
 cp ~/.bashrc ~/.bashrc.bak
 sed -i '8i\export PATH="~/.local/bin:$PATH"' ~/.zshrc
