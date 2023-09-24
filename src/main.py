@@ -174,7 +174,6 @@ class Action:
         response = requests.get("https://raw.githubusercontent.com/derrick921213/DPM-remake/main/VERSION.txt")
         if response.status_code == 200:
             new_version =  response.text
-        print(type(new_version))
         if compare_versions(old_version,new_version) == 1:
             repo_url = 'https://github.com/derrick921213/DPM-remake.git'
             os.mkdir(GIT_PATH) if not os.path.exists(GIT_PATH) else os.system(f'rm -rf {DOWNLOAD_TEMP}/*')
