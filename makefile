@@ -18,13 +18,13 @@ dev:
 upgrade: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
-	$(PYTHON) -m nuitka --standalone --recurse-all --include-package=dpm_module --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
+	$(PYTHON) -m nuitka --standalone --include-package=dpm_module --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mv build/main.dist/ /usr/local/DPM/dist
 install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
-	$(PYTHON) -m nuitka --standalone --recurse-all --include-package=dpm_module --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
+	$(PYTHON) -m nuitka --standalone --include-package=dpm_module --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mkdir -p /usr/local/DPM/TEMP && \
 	mv build/main.dist/ /usr/local/DPM/dist && \
