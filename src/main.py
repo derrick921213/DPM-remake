@@ -132,7 +132,7 @@ class ubuntu:
     def __init__(self,packages:list,**kwargs):
         self.packages = packages
         self.kwargs = kwargs
-    def install(self,package_name):
+    def install(self):
         cache = apt.Cache()
         cache.update()
         for package_name in self.packages:
