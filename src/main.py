@@ -13,6 +13,11 @@ from colorama import Fore, Style
 from git import RemoteProgress
 from tqdm import tqdm
 import pwd
+try:
+    import apt,sys,re
+    from apt import debfile
+except ModuleNotFoundError:
+    pass
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/bin'
@@ -124,11 +129,7 @@ class mac:
                     print(line)
         process.wait()
 class ubuntu:
-    try:
-        import apt,sys,re
-        from apt import debfile
-    except ModuleNotFoundError:
-        pass
+    
     def __init__(self,packages:list,**kwargs):
         self.packages = packages
         self.kwargs = kwargs
