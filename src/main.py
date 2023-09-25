@@ -72,6 +72,13 @@ def exec_cmd(cmd,username):
     env.update({'HOME': homedir, 'LOGNAME': username, 'PWD': os.getcwd(), 'USER': username})
     proc = subprocess.Popen(cmd,shell=True,text=True,env=env,preexec_fn=demote(user_uid, user_gid),stdout=subprocess.PIPE)
     return proc
+def check_system():
+    ret = mac
+    if dist_like is not None and dist_like == 'debian':
+        ret = ubuntu
+    elif dist_like is not None and dist_like == 'rhel':
+        ret = rhel
+    return ret
 class mac:
     def __init__(self,packages:list,**kwargs):
         self.original_user = os.environ.get("SUDO_USER")
@@ -448,7 +455,6 @@ if __name__ == '__main__':
     _auto_zsh.autocomplete(parser)
     args = parser.parse_args()
     try:
-        check_system()
         if not check_sudo():
             raise Error(f"{Fore.RED}無法切換管理員身份{Style.RESET_ALL}")
         if not os.path.isdir(INSTALL_DIR):
