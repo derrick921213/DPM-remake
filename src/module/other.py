@@ -1,4 +1,4 @@
-from .interface import SysAPI
+from module.interface import SysAPI
 from typing import NoReturn
 import subprocess,os
 import pwd
