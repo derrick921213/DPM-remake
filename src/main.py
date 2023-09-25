@@ -12,6 +12,7 @@ from io import BytesIO
 from colorama import Fore, Style
 from git import RemoteProgress
 from tqdm import tqdm
+import pwd
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/bin'
@@ -56,16 +57,115 @@ def compare_software_version(old: str, new: str) -> bool:
     return False
 def check_sudo():
     return True if os.geteuid() == 0 else False
-def check_system():
-    if dist_like is not None and 'debian' in dist_like:
-        from dpm_module.debian import ubuntu
-        return ubuntu
-    elif dist_like is not None and 'rhel' in dist_like:
-        from dpm_module.rhel import rhel
-        return rhel
-    else:
-        from dpm_module.other import mac
-        return mac
+def demote(user_uid, user_gid):
+    def result():
+        os.setgid(user_gid)
+        os.setuid(user_uid)
+    return result
+def exec_cmd(cmd,username):
+    # get user info from username
+    pw_record = pwd.getpwnam(username)
+    homedir = pw_record.pw_dir
+    user_uid = pw_record.pw_uid
+    user_gid = pw_record.pw_gid
+    env = os.environ.copy()
+    env.update({'HOME': homedir, 'LOGNAME': username, 'PWD': os.getcwd(), 'USER': username})
+    proc = subprocess.Popen(cmd,shell=True,text=True,env=env,preexec_fn=demote(user_uid, user_gid),stdout=subprocess.PIPE)
+    return proc
+class mac:
+    def __init__(self,packages:list,**kwargs):
+        self.original_user = os.environ.get("SUDO_USER")
+        self.packages = packages
+        self.kwargs = kwargs
+        # super().__init__(packages,**kwargs)
+    def install(self):
+        pk_name = " ".join(self.packages)
+        command = f"brew install {pk_name}"
+        process = exec_cmd(command,self.original_user)
+        if self.kwargs.get('verbose'):
+            while True:
+                return_code = process.poll()
+                if return_code is not None:
+                    break
+                line = process.stdout.readline().strip()
+                if line:
+                    print(line)
+        process.wait()
+    def uninstall(self): 
+        pk_name = " ".join(self.packages)
+        command = f"brew uninstall {pk_name}"
+        process = exec_cmd(command,self.original_user)
+        if self.kwargs.get('verbose'):
+            while True:
+                return_code = process.poll()
+                if return_code is not None:
+                    break
+                line = process.stdout.readline().strip()
+                if line:
+                    print(line)
+        process.wait()
+    def update(self): 
+        command = f"brew update"
+        process = exec_cmd(command,self.original_user)
+        if self.kwargs.get('verbose'):
+            while True:
+                return_code = process.poll()
+                if return_code is not None:
+                    break
+                line = process.stdout.readline().strip()
+                if line:
+                    print(line)
+        process.wait()
+class ubuntu:
+    def __init__(self,packages:list,**kwargs):
+        # super().__init__(packages,**kwargs)
+        self.packages = packages
+        self.kwargs = kwargs
+    try:
+        import apt,sys,re
+        from apt import debfile
+        def install(self,package_name):
+            cache = apt.Cache()
+            cache.update()
+            for package_name in self.packages:
+                if re.search(r'\.deb$', package_name) is not None :
+                    package_name = debfile.DebPackage(package_name, cache)
+                    if package_name.check():
+                        package = cache[package_name.pkgname]
+                        if not package.is_installed: package_name.install()
+                        else: print(f"{package_name.pkgname} is already installed.") 
+                    else: print(f"{package._failure_string}")
+                else:
+                    package = cache[package_name]
+                    if package.is_installed: print(f"{package_name} is already installed.")
+                    else:
+                        package.mark_install()
+                        cache.commit()
+        def uninstall(self):
+            cache = apt.Cache()
+            cache.update()
+            for package_name in self.packages:
+                package = cache[package_name]
+                if package.is_installed:
+                    package.mark_delete()
+                    cache.commit()
+                    print(f"{package_name} 已移除。")
+                else: print(f"{package_name} 未安装，无需移除。")
+        def update(self):
+            try:
+                cache = apt.Cache()
+                cache.update()
+                cache.open(None)
+                cache.upgrade()
+                cache.commit()
+                print("Software package list has been successfully updated.")
+            except Exception as e:
+                print(f"Failed to update software package list: {e}")
+    except ModuleNotFoundError:
+        pass
+class rhel:
+    def __init__(self):
+        print('RHEL')
 class CloneProgress(RemoteProgress):
     def __init__(self):
         super().__init__()
