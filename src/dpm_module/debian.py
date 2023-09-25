@@ -1,4 +1,4 @@
-from module.interface import SysAPI
+from dpm_module.interface import SysAPI
 class ubuntu(SysAPI):
     def __init__(self,packages:list,**kwargs):
         super().__init__(packages,**kwargs)

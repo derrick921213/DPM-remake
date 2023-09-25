@@ -58,13 +58,13 @@ def check_sudo():
     return True if os.geteuid() == 0 else False
 def check_system():
     if dist_like is not None and 'debian' in dist_like:
-        from module.debian import ubuntu
+        from dpm_module.debian import ubuntu
         return ubuntu
     elif dist_like is not None and 'rhel' in dist_like:
-        from module.rhel import rhel
+        from dpm_module.rhel import rhel
         return rhel
     else:
-        from module.other import mac
+        from dpm_module.other import mac
         return mac
 class CloneProgress(RemoteProgress):
     def __init__(self):
