@@ -1,7 +1,9 @@
 # from dpm_module.interface import SysAPI
 class ubuntu:
     def __init__(self,packages:list,**kwargs):
-        super().__init__(packages,**kwargs)
+        # super().__init__(packages,**kwargs)
+        self.packages = packages
+        self.kwargs = kwargs
     try:
         import apt,sys,re
         from apt import debfile

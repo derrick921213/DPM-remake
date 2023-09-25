@@ -21,7 +21,9 @@ def exec_cmd(cmd,username):
 class mac:
     def __init__(self,packages:list,**kwargs):
         self.original_user = os.environ.get("SUDO_USER")
-        super().__init__(packages,**kwargs)
+        self.packages = packages
+        self.kwargs = kwargs
+        # super().__init__(packages,**kwargs)
     def install(self)->NoReturn:
         pk_name = " ".join(self.packages)
         command = f"brew install {pk_name}"
