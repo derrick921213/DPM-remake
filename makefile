@@ -20,14 +20,14 @@ upgrade: dev
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
-	mv build/dpm.$(IVERSION) /usr/bin/dpm
+	mv build/dpm.$(IVERSION) /usr/local/DPM/
 install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mkdir -p /usr/local/DPM/TEMP && \
-	mv build/main.dist/ /usr/local/DPM/dist && \
+	mv build/dpm.$(IVERSION) /usr/local/DPM/ && \
 	cd / && \
 	rm -rf $(shell pwd) && \
 	ln -s /usr/local/DPM/dpm.$(IVERSION) /usr/bin/dpm
