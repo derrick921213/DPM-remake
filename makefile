@@ -20,7 +20,7 @@ upgrade: dev
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
-	mv build/main.dist/ /usr/local/DPM/dist
+	mv build/dpm.$(IVERSION) /usr/bin/dpm
 install: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
