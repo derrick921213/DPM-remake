@@ -348,6 +348,7 @@ if __name__ == '__main__':
     _auto_zsh.autocomplete(parser)
     args = parser.parse_args()
     try:
+        check_system()
         if not check_sudo():
             raise Error(f"{Fore.RED}無法切換管理員身份{Style.RESET_ALL}")
         if not os.path.isdir(INSTALL_DIR):
