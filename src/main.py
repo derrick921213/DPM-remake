@@ -4,7 +4,8 @@ import argparse as _arg
 from argparse import RawTextHelpFormatter
 import argcomplete as _auto
 import pyzshcomplete as _auto_zsh
-from sys import platform as plat
+# from sys import platform as plat
+import platform as plat
 import sys,os,json,wget,subprocess,requests,tarfile,shutil,git,re
 from urllib.request import urlopen
 from io import BytesIO
@@ -17,7 +18,24 @@ BIN_DIR = '/usr/bin'
 GIT_PATH = f'{DOWNLOAD_TEMP}/DPM_SRC'
 BACKUP_PATH = f'{DOWNLOAD_TEMP}/Backup'
 VERSION = 'V1'
-
+system_type = plat.system()
+dist_name, dist_version,dist_like = (None,None,None)
+def get_linux_distribution():
+    try:
+        with open('/etc/os-release', 'r') as f:
+            lines = f.readlines()
+            dist_info = {}
+            for line in lines:
+                parts = line.strip().split('=')
+                if len(parts) == 2:
+                    key, value = parts[0], parts[1].strip('"')
+                    dist_info[key] = value
+            return dist_info.get('NAME'), dist_info.get('VERSION'),dist_info.get('ID_LIKE')
+    except FileNotFoundError:
+        return None, None, None
+if system_type == "Linux":
+    dist_name, dist_version,dist_like = get_linux_distribution()
+    dist_like = dist_like.split(' ')
 def compare_versions(old, new,pattern = r'\d+'):
     old_v = [int(match) for match in re.findall(pattern, old)]
     new_v = [int(match) for match in re.findall(pattern, new)]
@@ -27,7 +45,6 @@ def compare_versions(old, new,pattern = r'\d+'):
     elif old_v > new_v:
         ret=-1
     return ret
-    # return True if [int(match) for match in re.findall(pattern, old)] < [int(match) for match in re.findall(pattern, new)] else False
 def compare_software_version(old: str, new: str) -> bool:
     old_list = list(map(int, old.split('.')))
     new_list = list(map(int, new.split('.')))
@@ -37,10 +54,18 @@ def compare_software_version(old: str, new: str) -> bool:
         if old_num < new_num:
             return True
     return False
-
-
 def check_sudo():
     return True if os.geteuid() == 0 else False
+def check_system():
+    if dist_like is not None and 'debian' in dist_like:
+        from module.debian import ubuntu
+        return ubuntu
+    elif dist_like is not None and 'rhel' in dist_like:
+        from module.rhel import rhel
+        return rhel
+    else:
+        from module.other import mac
+        return mac
 class CloneProgress(RemoteProgress):
     def __init__(self):
         super().__init__()
@@ -79,7 +104,6 @@ class Action:
         if len(kwargs['package'])==0:
             all_package = self.installed_package_list()
             for name in all_package:
-                # print(name)
                 new = download.read_package_info(name,remote=True)["version"]
                 old = download.read_package_info(name,path=INSTALL_DIR)["version"]
                 if compare_software_version(old,new):
@@ -119,10 +143,11 @@ class Action:
                     os.symlink(software,f'{BIN_DIR}/{name}')
                     print(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.BLUE}Update Successed.{Style.RESET_ALL}')
                     os.unlink(os.path.join(DOWNLOAD_TEMP,f'dpm_{name}.tgz'))
-            if len(kwargs['NotMy'])>0:
-                # 進入系統管理包程序
-                print(kwargs['NotMy'])
-
+        if len(kwargs['NotMy'])==0:
+            # 進入系統管理包程序
+            callback = check_system()
+            syscall = callback(kwargs['NotMy'],**kwargs)
+            syscall.update()
     def install(self, **kwargs):
         download:'Download' = Download()
         shell:'Shell' = Shell()
@@ -147,7 +172,9 @@ class Action:
                 os.unlink(os.path.join(DOWNLOAD_TEMP,f'dpm_{i}.tgz'))
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
-            print(kwargs['NotMy'])
+            callback = check_system()
+            syscall = callback(kwargs['NotMy'],**kwargs)
+            syscall.install()
     def uninstall(self, **kwargs):
         download:'Download' = Download()
         shell:'Shell' = Shell()
@@ -168,7 +195,9 @@ class Action:
                 print(f'{Fore.YELLOW}{name}{Style.RESET_ALL} {Fore.RED}Removed!!{Style.RESET_ALL}')
         if len(kwargs['NotMy'])>0:
             # 進入系統管理包程序
-            print(kwargs['NotMy'])
+            callback = check_system()
+            syscall = callback(kwargs['NotMy'],**kwargs)
+            syscall.uninstall()
     def update(self, **kwargs):
         old_version = Shell().runcmd(f'sudo dpm version',verbose=True,ret=True)
         response = requests.get("https://raw.githubusercontent.com/derrick921213/DPM-remake/main/VERSION.txt")
@@ -271,132 +300,6 @@ class Shell:
             print('Platform_Error:This application only on Linux or Mac')
             sys.exit(1)
         return 'linux' if plat == 'linux' else 'darwin'
-    def linux_shell(self, package, install=False, uninstall=False, update=False, verbose=False):
-        if install is True and uninstall is False and update is False:
-            if os.system("which apt >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo apt install {package} -y") == 0:
-                        print(f'[{package}] Install from apt')
-                        sys.exit(0)
-                if os.system(f"sudo apt install {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Install from apt')
-                    sys.exit(0)
-            elif os.system("which dnf >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo dnf install {package} -y") == 0:
-                        print(f'[{package}] Install from dnf')
-                        sys.exit(0)
-                if os.system(f"sudo dnf install {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Install from dnf')
-                    sys.exit(0)
-            elif os.system("which yum >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo yum install {package} -y") == 0:
-                        print(f'[{package}] Install from yum')
-                        sys.exit(0)
-                if os.system(f"sudo yum install {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Install from yum')
-                    sys.exit(0)
-            else:
-                print('Package manager not found')
-                sys.exit(1)
-        elif install is False and uninstall is True and update is False:
-            if os.system("which apt >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo apt remove {package} -y") == 0:
-                        print(f'[{package}] Uninstall from apt')
-                        sys.exit(0)
-                if os.system(f"sudo apt remove {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Uninstall from apt')
-                    sys.exit(0)
-            elif os.system("which dnf >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo dnf install {package} -y ") == 0:
-                        print(f'[{package}] Uninstall from dnf')
-                        sys.exit(0)
-                if os.system(f"sudo dnf install {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Uninstall from dnf')
-                    sys.exit(0)
-            elif os.system("which yum >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo yum remove {package} -y ") == 0:
-                        print(f'[{package}] Uninstall from yum')
-                        sys.exit(0)
-                if os.system(f"sudo yum remove {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] Uninstall from yum')
-                    sys.exit(0)
-            else:
-                print('Package manager not found')
-                sys.exit(1)
-        elif install is False and uninstall is False and update is True:
-            if os.system("which apt >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo apt update {package} -y") == 0:
-                        print(f'[{package}] update from apt')
-                        sys.exit(0)
-                if os.system(f"sudo apt update {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] update from apt')
-                    sys.exit(0)
-            elif os.system("which dnf >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo dnf update {package} -y") == 0:
-                        print(f'[{package}] update from dnf')
-                        sys.exit(0)
-                if os.system(f"sudo dnf update {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] update from dnf')
-                    sys.exit(0)
-            elif os.system("which yum >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"sudo yum update {package} -y") == 0:
-                        print(f'[{package}] update from yum')
-                        sys.exit(0)
-                if os.system(f"sudo yum update {package} -y 1>/dev/null") == 0:
-                    print(f'[{package}] update from yum')
-                    sys.exit(0)
-            else:
-                print('Package manager not found')
-                sys.exit(1)
-        else:
-            print("Application Error")
-            sys.exit(1)
-    def mac_shell(self, package, install=False, uninstall=False, update=False, verbose=False):
-        if install is True and uninstall is False and update is False:
-            if os.system("which brew >/dev/null") == 0:
-                if verbose:
-                    if os.system(f"brew install {package}") == 0:
-                        print(f'[{package}] Install from Homebrew')
-                        sys.exit(0)
-                if os.system(f"brew install {package} 1>/dev/null") == 0:
-                    print(f'[{package}] Install from Homebrew')
-                    sys.exit(0)
-            else:
-                print('Homebrew not found')
-                sys.exit(1)
-        elif install is False and uninstall is True and update is False:
-            if verbose:
-                if os.system(f"brew uninstall {package}") == 0:
-                    print(f'[{package}] was Removed from Homebrew')
-                    sys.exit(0)
-            if os.system(f"brew uninstall {package} 1>/dev/null") == 0:
-                print(f'[{package}] was Removed from Homebrew')
-                sys.exit(0)
-            else:
-                print(f"Remove [{package}] Error!!")
-                sys.exit(1)
-        elif install is False and update is False and update is True:
-            if verbose:
-                if os.system(f"brew upgrade {package}") == 0:
-                    print(f'[{package}] was Upgraded from Homebrew')
-                    sys.exit(0)
-            if os.system(f"brew upgrade {package} 1>/dev/null") == 0:
-                print(f'[{package}] was Upgraded from Homebrew')
-                sys.exit(0)
-            else:
-                print(f"Upgrade [{package}] Error!!")
-                sys.exit(1)
-        else:
-            print("Application Error")
-            sys.exit(1)
 class Main:
     def __init__(self,args):
         action = Action()
