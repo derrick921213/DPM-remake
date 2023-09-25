@@ -74,9 +74,9 @@ def exec_cmd(cmd,username):
     return proc
 def check_system():
     ret = mac
-    if dist_like is not None and dist_like == 'debian':
+    if dist_like is not None and 'debian' in dist_like:
         ret = ubuntu
-    elif dist_like is not None and dist_like == 'rhel':
+    elif dist_like is not None and 'rhel' in dist_like:
         ret = rhel
     return ret
 class mac:
