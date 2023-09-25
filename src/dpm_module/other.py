@@ -1,4 +1,4 @@
-from dpm_module.interface import SysAPI
+# from dpm_module.interface import SysAPI
 from typing import NoReturn
 import subprocess,os
 import pwd
@@ -18,7 +18,7 @@ def exec_cmd(cmd,username):
     env.update({'HOME': homedir, 'LOGNAME': username, 'PWD': os.getcwd(), 'USER': username})
     proc = subprocess.Popen(cmd,shell=True,text=True,env=env,preexec_fn=demote(user_uid, user_gid),stdout=subprocess.PIPE)
     return proc
-class mac(SysAPI):
+class mac:
     def __init__(self,packages:list,**kwargs):
         self.original_user = os.environ.get("SUDO_USER")
         super().__init__(packages,**kwargs)
