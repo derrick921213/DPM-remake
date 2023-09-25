@@ -13,11 +13,7 @@ from colorama import Fore, Style
 from git import RemoteProgress
 from tqdm import tqdm
 import pwd
-try:
-    import apt,sys,re
-    from apt import debfile
-except ModuleNotFoundError:
-    pass
+import importlib
 INSTALL_DIR = "/usr/local/DPM"
 DOWNLOAD_TEMP = os.path.join(INSTALL_DIR,'TEMP')
 BIN_DIR = '/usr/bin'
@@ -128,30 +124,39 @@ class mac:
                 if line:
                     print(line)
         process.wait()
+
 class ubuntu:
-    
-    def __init__(self,packages:list,**kwargs):
+    def __init__(self, packages, **kwargs):
         self.packages = packages
         self.kwargs = kwargs
+
+        # 动态导入 apt 模块
+        self.apt = importlib.import_module('apt')
+        self.re = importlib.import_module('re')
     def install(self):
-        cache = apt.Cache()
+        cache = self.apt.Cache()
         cache.update()
         for package_name in self.packages:
-            if re.search(r'\.deb$', package_name) is not None :
-                package_name = debfile.DebPackage(package_name, cache)
+            if self.re.search(r'\.deb$', package_name) is not None:
+                package_name = self.apt.debfile.DebPackage(package_name, cache)
                 if package_name.check():
                     package = cache[package_name.pkgname]
-                    if not package.is_installed: package_name.install()
-                    else: print(f"{package_name.pkgname} is already installed.") 
-                else: print(f"{package._failure_string}")
+                    if not package.is_installed:
+                        package_name.install()
+                    else:
+                        print(f"{package_name.pkgname} is already installed.")
+                else:
+                    print(f"{package_name._failure_string}")
             else:
                 package = cache[package_name]
-                if package.is_installed: print(f"{package_name} is already installed.")
+                if package.is_installed:
+                    print(f"{package_name} is already installed.")
                 else:
                     package.mark_install()
                     cache.commit()
+
     def uninstall(self):
-        cache = apt.Cache()
+        cache = self.apt.Cache()
         cache.update()
         for package_name in self.packages:
             package = cache[package_name]
@@ -159,10 +164,12 @@ class ubuntu:
                 package.mark_delete()
                 cache.commit()
                 print(f"{package_name} 已移除。")
-            else: print(f"{package_name} 未安装，无需移除。")
+            else:
+                print(f"{package_name} 未安装，无需移除.")
+
     def update(self):
         try:
-            cache = apt.Cache()
+            cache = self.apt.Cache()
             cache.update()
             cache.open(None)
             cache.upgrade()
