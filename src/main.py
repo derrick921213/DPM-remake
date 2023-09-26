@@ -4,7 +4,6 @@ import argparse as _arg
 from argparse import RawTextHelpFormatter
 import argcomplete as _auto
 import pyzshcomplete as _auto_zsh
-# from sys import platform as plat
 import platform as plat
 import sys,os,json,wget,subprocess,requests,tarfile,shutil,git,re
 from urllib.request import urlopen
@@ -124,7 +123,6 @@ class mac:
                 if line:
                     print(line)
         process.wait()
-
 class ubuntu:
     def __init__(self, packages, **kwargs):
         self.packages = packages
@@ -155,7 +153,6 @@ class ubuntu:
                 else:
                     package.mark_install()
                     cache.commit()
-
     def uninstall(self):
         cache = self.apt.Cache()
         cache.update()
@@ -167,7 +164,6 @@ class ubuntu:
                 print(f"{package_name} 已移除。")
             else:
                 print(f"{package_name} 未安装，无需移除.")
-
     def update(self):
         try:
             cache = self.apt.Cache()
@@ -452,7 +448,6 @@ class Main:
                 pass
         else:
             self.FUNC.get(args.commands)(**func_args)
-
 if __name__ == '__main__':
     parser = _arg.ArgumentParser(prog="dpm", description="DPM is a package manager", formatter_class=RawTextHelpFormatter, epilog="Further help: \n  https://github.com/derrick921213/DPM-remake/")
     group = parser.add_mutually_exclusive_group()
