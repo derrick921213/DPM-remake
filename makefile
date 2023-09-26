@@ -14,7 +14,7 @@ help:
 	@echo "make upgrade"
 	@echo "       Upgrade DPM"
 dev:
-	@python3 -m venv venv
+	@python3 -m venv --system-site-packages venv
 upgrade: dev
 	. $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
