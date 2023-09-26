@@ -132,13 +132,14 @@ class ubuntu:
 
         # 动态导入 apt 模块
         self.apt = importlib.import_module('apt')
+        self.debfile = importlib.import_module('apt.debfile')
         self.re = importlib.import_module('re')
     def install(self):
         cache = self.apt.Cache()
         cache.update()
         for package_name in self.packages:
             if self.re.search(r'\.deb$', package_name) is not None:
-                package_name = self.apt.debfile.DebPackage(package_name, cache)
+                package_name = self.debfile.DebPackage(package_name, cache)
                 if package_name.check():
                     package = cache[package_name.pkgname]
                     if not package.is_installed:
