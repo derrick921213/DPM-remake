@@ -128,7 +128,7 @@ class ubuntu:
         self.packages = packages
         self.kwargs = kwargs
 
-        # 动态导入 apt 模块
+        # 動態導入 apt 模块
         self.apt = importlib.import_module('apt')
         self.debfile = importlib.import_module('apt.debfile')
         self.re = importlib.import_module('re')
@@ -175,8 +175,53 @@ class ubuntu:
         except Exception as e:
             print(f"Failed to update software package list: {e}")
 class rhel:
-    def __init__(self):
-        print('RHEL')
+    def __init__(self,packages,**kwargs):
+        self.packages = packages
+        self.kwargs = kwargs
+
+        # 動態導入 dnf 模块
+        self.dnf = importlib.import_module('dnf')
+        self.progress = importlib.import_module('dnf.cli.progress')
+        self.re = importlib.import_module('re')
+    def install(self):
+        base = self.dnf.Base()
+        base.read_all_repos()
+        base.fill_sack()
+        for package_name in self.packages:
+            try:
+                base.install(package_name)
+                base.resolve()
+                progress = self.dnf.cli.progress.MultiFileProgressMeter()
+                base.download_packages(base.transaction.install_set, progress)
+                base.do_transaction()
+                print(f"Package '{package_name}' installed successfully.")
+            except self.dnf.exceptions.Error as e:
+                print(f"Error installing '{package_name}': {e}")
+    def uninstall(self):
+        base = self.dnf.Base()
+        base.read_all_repos()
+        base.fill_sack()
+        for package_name in self.packages:
+            try:
+                package = base.sack.query().filter(name=package_name).run()
+                if package:
+                    base.remove(package_name)
+                    base.resolve()
+                    base.do_transaction()
+                    print(f"Package '{package_name}' uninstalled successfully.")
+                else: print(f"Package '{package_name}' is not installed.")
+            except self.dnf.exceptions.Error as e:
+                print(f"Error uninstalling '{package_name}': {e}")
+    def update(self):
+        base = self.dnf.Base()
+        base.read_all_repos()
+        base.fill_sack()
+        try:
+            base.resolve()
+            base.upgrade_all()
+            base.do_transaction()
+        except self.dnf.exceptions.Error as e:
+            print(f"Error update ': {e}")
 class CloneProgress(RemoteProgress):
     def __init__(self):
         super().__init__()
