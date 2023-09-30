@@ -14,7 +14,7 @@ if exists_in_list "$os_like" " " debian; then
     sudo apt update -y && sudo apt install build-essential python3-venv patchelf software-properties-common git -y
 elif exists_in_list "$os_like" " " rhel; then
     sudo dnf groupinstall "Development Tools" -y
-    sudo dnf update -y &&  sudo dnf install epel-release -y && sudo dnf install python3 patchelf git python3-devel yum-utils make gcc openssl-devel bzip2-devel libffi-devel zlib-devel ibdnf librar -y
+    sudo dnf update -y &&  sudo dnf install epel-release -y && sudo dnf install python3 patchelf git python3-devel yum-utils make gcc openssl-devel bzip2-devel libffi-devel zlib-devel libdnf librar -y
 else
     exit 1
 fi
