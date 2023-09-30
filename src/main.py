@@ -191,7 +191,7 @@ class rhel:
             try:
                 base.install(package_name)
                 base.resolve()
-                progress = self.dnf.cli.progress.MultiFileProgressMeter()
+                progress = self.progress.MultiFileProgressMeter()
                 base.download_packages(base.transaction.install_set, progress)
                 base.do_transaction()
                 print(f"Package '{package_name}' installed successfully.")
