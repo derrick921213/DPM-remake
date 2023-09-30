@@ -16,13 +16,13 @@ help:
 dev:
 	@python3 -m venv --system-site-packages venv
 upgrade: dev
-	. $(VENV_ACTIVATE) && \
+	source $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
 	mv build/dpm.$(IVERSION) /usr/local/DPM/
 install: dev
-	. $(VENV_ACTIVATE) && \
+	source $(VENV_ACTIVATE) && \
 	pip3 install -r requirements.txt && \
 	$(PYTHON) -m nuitka --standalone --onefile --output-dir=build --show-progress  --disable-ccache --follow-imports  $(SRC)/main.py -o dpm.$(IVERSION) && \
 	deactivate && \
