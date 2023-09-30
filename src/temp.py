@@ -342,37 +342,37 @@
 # # dist_info = distro.linux_distribution(full_distribution_name=False)
 # print(distro.id(),distro.version(),distro.name())
 
-import subprocess
+# import subprocess
 
-def install_package_with_output(package_name:list):
-    pk_name = " ".join(package_name)
-    # print(pk_name)
-    command = f"brew install {pk_name}"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+# def install_package_with_output(package_name:list):
+#     pk_name = " ".join(package_name)
+#     # print(pk_name)
+#     command = f"brew install {pk_name}"
+#     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-    for line in process.stdout:
-        print(line.strip())
-    process.wait()
+#     for line in process.stdout:
+#         print(line.strip())
+#     process.wait()
 
-def list_installed_packages():
-    command = "brew list"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True)
-    output, _ = process.communicate()
-    return output
-def update_brew():
-    command = "brew update"
-    process = subprocess.Popen(command, shell=True)
-    process.wait()
-def uninstall_package_with_output(package_name:list):
-    pk_name = " ".join(package_name)
-    command = f"brew uninstall {pk_name}"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    for line in process.stdout:
-        print(line.strip())
-    process.wait()
+# def list_installed_packages():
+#     command = "brew list"
+#     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, text=True)
+#     output, _ = process.communicate()
+#     return output
+# def update_brew():
+#     command = "brew update"
+#     process = subprocess.Popen(command, shell=True)
+#     process.wait()
+# def uninstall_package_with_output(package_name:list):
+#     pk_name = " ".join(package_name)
+#     command = f"brew uninstall {pk_name}"
+#     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+#     for line in process.stdout:
+#         print(line.strip())
+#     process.wait()
 # # 调用函数来列出已安装的软件包
 # installed_packages = list_installed_packages()
 # print("Installed packages:")
 # print(installed_packages)
-install_package_with_output(["wget","curl"])
+# install_package_with_output(["wget","curl"])
 # uninstall_package_with_output("wget")
