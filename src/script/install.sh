@@ -11,7 +11,7 @@ os_release_info=$(cat /etc/os-release)
 os_like=$(echo "$os_release_info" | grep -o 'ID_LIKE=.*' | cut -d'=' -f2 | sed 's/"//g')
 os_like2=($os_like)
 if exists_in_list "$os_like" " " debian; then
-    sudo apt update -y && sudo apt install build-essential python3-venv patchelf software-properties-common git -y
+    sudo apt update -y && sudo apt install build-essential python3-venv python3-dev patchelf software-properties-common git -y
 elif exists_in_list "$os_like" " " rhel; then
     sudo dnf groupinstall "Development Tools" -y
     sudo dnf update -y &&  sudo dnf install epel-release -y && sudo dnf install python3 patchelf git python3-devel yum-utils gcc openssl-devel bzip2-devel libffi-devel zlib-devel libdnf make -y
